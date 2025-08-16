@@ -1,269 +1,222 @@
-# 📊 Attendance Management System
+# Project Rikio - Employee Management System
 
-A modern full-stack attendance management system built with **Go (Gin)** backend and **Next.js** frontend.
+A full-stack employee management system built with Go (backend) and Next.js (frontend).
 
-## 🚀 Features
-
-### Core Features
-- ✅ **Employee Management** - Add, edit, delete employees with department assignment
-- ✅ **Department Management** - Configure departments with custom clock-in/out policies
-- ✅ **Attendance Tracking** - Clock in/out functionality with time validation
-- ✅ **Real-time Dashboard** - View attendance logs with filtering and search
-- ✅ **CSV Export** - Export attendance data for reporting
-- ✅ **Responsive UI** - Modern interface built with Tailwind CSS
-
-### Technical Features
-- 🔐 **Type Safety** - Full TypeScript implementation
-- 📱 **Responsive Design** - Works on desktop and mobile
-- 🎨 **Modern UI** - Clean interface with Heroicons
-- ⚡ **Fast Performance** - Optimized with Next.js and Go
-- 🗄️ **Database** - MySQL with proper schema design
-
-## 🏗️ Architecture
+## 🏗️ Project Structure
 
 ```
-Project-ryo/
-├── backend/          # Go (Gin) API Server
-│   ├── config/       # Database configuration
-│   ├── handlers/     # HTTP request handlers
-│   ├── models/       # Data models
-│   ├── routes/       # API routes
-│   └── services/     # Business logic
-└── frontend/         # Next.js React App
-    ├── src/
-    │   ├── app/      # Pages and routing
-    │   ├── components/ # Reusable components
-    │   ├── lib/      # API utilities
-    │   └── types/    # TypeScript definitions
+Project-rikio/
+├── backend/          # Go backend API
+├── frontend/         # Next.js frontend application
+├── docs/            # API documentation
+├── run-all.sh       # Script to run both backend and frontend
+├── run-backend.sh   # Script to run backend only
+└── run-frontend.sh  # Script to run frontend only
 ```
-
-## 🛠️ Tech Stack
-
-### Backend
-- **Go 1.21+** - Programming language
-- **Gin** - Web framework
-- **MySQL** - Database
-- **GORM** - ORM (if used)
-- **CORS** - Cross-origin support
-
-### Frontend
-- **Next.js 15** - React framework
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Heroicons** - Icons
-- **Axios** - HTTP client
-
-## 📋 Prerequisites
-
-- **Go 1.21+** installed
-- **Node.js 18+** installed
-- **MySQL** database server
-- **Git** for version control
 
 ## 🚀 Quick Start
 
-### Option 1: Run Everything (Recommended)
-```bash
-# Clone the repository
-git clone <repository-url>
-cd Project-ryo
+### Prerequisites
 
-# Make scripts executable
-chmod +x run-*.sh
+- Go 1.21+ 
+- Node.js 18+
+- Docker (optional, for database)
+- Git
 
-# Start both frontend and backend
-./run-all.sh
-```
+### Installation & Setup
 
-### Option 2: Run Individually
-```bash
-# Start backend only
-./run-backend.sh
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd Project-rikio
+   ```
 
-# Start frontend only (in another terminal)
-./run-frontend.sh
-```
-
-## ⚙️ Configuration
-
-### Backend Configuration
-1. Copy environment file:
+2. **Setup Backend**
    ```bash
    cd backend
    cp env.example .env
+   # Edit .env with your database configuration
+   go mod download
    ```
 
-2. Configure database settings in `.env`:
-   ```env
-   DB_HOST=localhost
-   DB_PORT=3306
-   DB_USER=your_username
-   DB_PASSWORD=your_password
-   DB_NAME=attendance_system
-   PORT=8080
+3. **Setup Frontend**
+   ```bash
+   cd frontend
+   npm install
    ```
 
-3. Create MySQL database:
-   ```sql
-   CREATE DATABASE attendance_system;
+4. **Run the Application**
+
+   **Option 1: Run everything at once**
+   ```bash
+   ./run-all.sh
    ```
+
+   **Option 2: Run separately**
+   ```bash
+   # Terminal 1 - Backend
+   ./run-backend.sh
+   
+   # Terminal 2 - Frontend
+   ./run-frontend.sh
+   ```
+
+## 🛠️ Technology Stack
+
+### Backend (Go)
+- **Framework**: Standard Go HTTP server
+- **Database**: PostgreSQL (with Docker support)
+- **ORM**: Custom database layer
+- **API**: RESTful API
+- **Features**: 
+  - Employee management
+  - Department management
+  - Attendance tracking
+  - CSV export functionality
+
+### Frontend (Next.js)
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: Custom components
+- **Features**:
+  - Employee CRUD operations
+  - Department management
+  - Attendance tracking
+  - Responsive design
+
+## 📁 Directory Structure
+
+### Backend Structure
+```
+backend/
+├── config/          # Configuration files
+├── database/        # Database schema and migrations
+├── handlers/        # HTTP request handlers
+├── models/          # Data models
+├── routes/          # API route definitions
+├── services/        # Business logic services
+├── main.go          # Application entry point
+└── Dockerfile       # Docker configuration
+```
+
+### Frontend Structure
+```
+frontend/
+├── src/
+│   ├── app/         # Next.js app router pages
+│   ├── components/  # Reusable UI components
+│   ├── lib/         # Utility functions and API client
+│   └── types/       # TypeScript type definitions
+├── public/          # Static assets
+└── package.json     # Dependencies and scripts
+```
+
+## 🔧 Configuration
+
+### Backend Environment Variables
+Create a `.env` file in the `backend/` directory:
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_NAME=rikio_db
+SERVER_PORT=8080
+```
 
 ### Frontend Configuration
-The frontend automatically connects to `http://localhost:8080` for the API.
+The frontend is configured to connect to the backend API running on `http://localhost:8080`.
 
-## 📱 Usage
+## 📚 API Documentation
 
-### Access the Application
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8080
+API documentation is available in the `docs/` directory. See `docs/API.md` for detailed endpoint documentation.
 
-### Main Features
-
-#### 1. Employee Management
-- Navigate to `/employees`
-- Add new employees with department assignment
-- Edit employee information
-- Delete employees
-
-#### 2. Department Management
-- Navigate to `/departments`
-- Create departments with custom policies
-- Set max clock-in/out times
-- Edit department settings
-
-#### 3. Attendance Tracking
-- Navigate to `/attendance`
-- Clock in/out for employees
-- View attendance logs
-- Filter by date, employee, or department
-- Export attendance data
-
-## 🔧 API Endpoints
-
-### Employees
-- `GET /api/employees` - Get all employees
-- `POST /api/employees` - Create employee
+### Main Endpoints
+- `GET /api/employees` - List all employees
+- `POST /api/employees` - Create new employee
 - `PUT /api/employees/:id` - Update employee
 - `DELETE /api/employees/:id` - Delete employee
+- `GET /api/departments` - List all departments
+- `GET /api/attendance` - Get attendance records
 
-### Departments
-- `GET /api/departments` - Get all departments
-- `POST /api/departments` - Create department
-- `PUT /api/departments/:id` - Update department
-- `DELETE /api/departments/:id` - Delete department
+## 🐳 Docker Support
 
-### Attendance
-- `GET /api/attendance/logs` - Get attendance logs
-- `POST /api/attendance/clock-in` - Clock in
-- `POST /api/attendance/clock-out` - Clock out
-
-### Export
-- `GET /api/export/employees` - Export employees CSV
-- `GET /api/export/departments` - Export departments CSV
-- `GET /api/export/attendance` - Export attendance CSV
-
-## 🗄️ Database Schema
-
-### Employees Table
-```sql
-- id (Primary Key)
-- employee_id (Unique)
-- departement_id (Foreign Key)
-- name
-- address
-- created_at
-- updated_at
+### Running with Docker Compose
+```bash
+cd backend
+docker-compose up -d
 ```
 
-### Departments Table
-```sql
-- id (Primary Key)
-- departement_name
-- max_clock_in_time
-- max_clock_out_time
-- created_at
-- updated_at
-```
-
-### Attendance Logs Table
-```sql
-- id (Primary Key)
-- employee_id (Foreign Key)
-- attendance_type (1=Clock In, 2=Clock Out)
-- date_attendance
-- is_on_time
-- created_at
-```
+This will start:
+- PostgreSQL database
+- Backend API server
 
 ## 🧪 Development
 
 ### Backend Development
 ```bash
 cd backend
-go mod tidy
 go run main.go
 ```
 
 ### Frontend Development
 ```bash
 cd frontend
-npm install
 npm run dev
 ```
 
-### Code Quality
+### Running Tests
 ```bash
-# Frontend linting
-cd frontend
-npm run lint
-
-# Backend formatting
+# Backend tests
 cd backend
-go fmt ./...
+go test ./...
+
+# Frontend tests
+cd frontend
+npm test
 ```
 
-## 📦 Deployment
+## 📦 Build for Production
 
-### Backend Deployment
-1. Build the Go binary:
-   ```bash
-   cd backend
-   go build -o attendance-system main.go
-   ```
+### Backend
+```bash
+cd backend
+go build -o main .
+```
 
-2. Set production environment variables
-3. Run the binary
-
-### Frontend Deployment
-1. Build the Next.js app:
-   ```bash
-   cd frontend
-   npm run build
-   ```
-
-2. Start the production server:
-   ```bash
-   npm start
-   ```
+### Frontend
+```bash
+cd frontend
+npm run build
+```
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 🆘 Support
 
-For support and questions:
-- Create an issue in the repository
-- Contact the development team
+If you encounter any issues or have questions, please:
+1. Check the documentation in the `docs/` directory
+2. Review existing issues in the repository
+3. Create a new issue with detailed information about your problem
+
+## 🔄 Updates
+
+Stay updated with the latest changes by:
+- Watching the repository
+- Checking the releases page
+- Following the commit history
 
 ---
 
-**Built with ❤️ using Go and Next.js**
+**Happy Coding! 🚀**
