@@ -65,8 +65,11 @@ export default function Dashboard() {
           attendanceApi.getLogs({ date: yesterday })
         ]);
 
-        const onTimeCount = todayAttendanceRes.attendance_logs.filter(log => log.is_on_time).length;
-        const lateCount = todayAttendanceRes.attendance_logs.filter(log => !log.is_on_time).length;
+        const todayLogs = todayAttendanceRes.attendance_logs || [];
+        const yesterdayLogs = yesterdayAttendanceRes.attendance_logs || [];
+        
+        const onTimeCount = todayLogs.filter(log => log.is_on_time).length;
+        const lateCount = todayLogs.filter(log => !log.is_on_time).length;
         const attendanceRate = employeesRes.count > 0 ? (todayAttendanceRes.count / employeesRes.count) * 100 : 0;
         const previousDayAttendance = yesterdayAttendanceRes.count;
         const attendanceChange = previousDayAttendance > 0 ? 
@@ -84,7 +87,7 @@ export default function Dashboard() {
         });
 
         // Generate recent activity from today's attendance logs
-        const activity: RecentActivity[] = todayAttendanceRes.attendance_logs
+        const activity: RecentActivity[] = todayLogs
           .slice(0, 5)
           .map(log => ({
             id: log.id,

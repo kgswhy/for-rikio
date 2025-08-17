@@ -189,14 +189,13 @@ export default function AttendancePage() {
               <div className="space-y-2">
                 <Label htmlFor="department">Department</Label>
                 <Select
-                  value={filters.department_id?.toString() || ''}
+                  value={filters.department_id?.toString() || undefined}
                   onValueChange={(value) => handleFilterChange('department_id', value ? parseInt(value) : undefined)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All Departments" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Departments</SelectItem>
                     {departments.map((dept) => (
                       <SelectItem key={dept.id} value={dept.id.toString()}>
                         {dept.departement_name}
