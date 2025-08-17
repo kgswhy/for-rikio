@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"attendance-system/config"
 	"attendance-system/routes"
@@ -10,6 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
+
+var startTime = time.Now()
 
 func main() {
 	// Load environment variables
@@ -31,9 +34,6 @@ func main() {
 
 	// Initialize router
 	r := gin.Default()
-
-	// CORS middleware
-	r.Use(gin.Recovery())
 
 	// Setup routes
 	routes.SetupRoutes(r, db)

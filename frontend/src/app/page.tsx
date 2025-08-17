@@ -38,6 +38,14 @@ interface RecentActivity {
   status: 'success' | 'warning' | 'error';
 }
 
+interface SystemStatus {
+  apiHealth: 'online' | 'offline' | 'error';
+  databaseStatus: 'connected' | 'disconnected' | 'error';
+  responseTime: number;
+  lastChecked: string;
+  uptime: string;
+}
+
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats>({
     totalEmployees: 0,
@@ -51,12 +59,22 @@ export default function Dashboard() {
   });
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [systemStatus, setSystemStatus] = useState<SystemStatus>({
+    apiHealth: 'offline',
+    databaseStatus: 'disconnected',
+    responseTime: 0,
+    lastChecked: new Date().toISOString(),
+    uptime: '0s'
+  });
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
+        setLoading(true);
         const today = new Date().toISOString().split('T')[0];
         const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        
+        console.log('Fetching dashboard data for:', { today, yesterday });
         
         const [employeesRes, departmentsRes, todayAttendanceRes, yesterdayAttendanceRes] = await Promise.all([
           employeeApi.getAll(),
@@ -65,8 +83,17 @@ export default function Dashboard() {
           attendanceApi.getLogs({ date: yesterday })
         ]);
 
+        console.log('API Responses:', {
+          employees: employeesRes,
+          departments: departmentsRes,
+          todayAttendance: todayAttendanceRes,
+          yesterdayAttendance: yesterdayAttendanceRes
+        });
+
         const todayLogs = todayAttendanceRes.attendance_logs || [];
         const yesterdayLogs = yesterdayAttendanceRes.attendance_logs || [];
+        
+        console.log('Processed logs:', { todayLogs, yesterdayLogs });
         
         const onTimeCount = todayLogs.filter(log => log.is_on_time).length;
         const lateCount = todayLogs.filter(log => !log.is_on_time).length;
@@ -74,6 +101,14 @@ export default function Dashboard() {
         const previousDayAttendance = yesterdayAttendanceRes.count;
         const attendanceChange = previousDayAttendance > 0 ? 
           ((todayAttendanceRes.count - previousDayAttendance) / previousDayAttendance) * 100 : 0;
+
+        console.log('Calculated stats:', {
+          onTimeCount,
+          lateCount,
+          attendanceRate,
+          previousDayAttendance,
+          attendanceChange
+        });
 
         setStats({
           totalEmployees: employeesRes.count,
@@ -97,6 +132,7 @@ export default function Dashboard() {
             status: log.is_on_time ? 'success' : 'warning'
           }));
 
+        console.log('Recent activity:', activity);
         setRecentActivity(activity);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -105,7 +141,47 @@ export default function Dashboard() {
       }
     };
 
+    const checkSystemHealth = async () => {
+      try {
+        const startTime = Date.now();
+        const healthResponse = await fetch('http://localhost:8080/health');
+        const responseTime = Date.now() - startTime;
+        
+        if (healthResponse.ok) {
+          const healthData = await healthResponse.json();
+          setSystemStatus({
+            apiHealth: 'online',
+            databaseStatus: 'connected',
+            responseTime,
+            lastChecked: new Date().toISOString(),
+            uptime: healthData.uptime || 'Unknown'
+          });
+        } else {
+          setSystemStatus(prev => ({
+            ...prev,
+            apiHealth: 'error',
+            responseTime,
+            lastChecked: new Date().toISOString()
+          }));
+        }
+      } catch (error) {
+        setSystemStatus(prev => ({
+          ...prev,
+          apiHealth: 'offline',
+          databaseStatus: 'disconnected',
+          responseTime: 0,
+          lastChecked: new Date().toISOString()
+        }));
+      }
+    };
+
     fetchDashboardData();
+    checkSystemHealth();
+    
+    // Set up interval to check system health every 30 seconds
+    const healthInterval = setInterval(checkSystemHealth, 30000);
+    
+    return () => clearInterval(healthInterval);
   }, []);
 
   const statCards = [
@@ -364,50 +440,62 @@ export default function Dashboard() {
           </div>
 
           {/* System Status */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">System Status</h3>
-              <p className="mt-1 text-sm text-gray-600">Current system health and performance</p>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-4 bg-green-50 rounded-lg border border-green-200">
-                  <div className="flex items-center">
-                    <CheckCircleIcon className="mr-3 w-5 h-5 text-green-500" />
-                    <div>
-                      <p className="text-sm font-medium text-green-900">System Status</p>
-                      <p className="text-xs text-green-700">All systems operational</p>
-                    </div>
-                  </div>
-                  <span className="px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full">
-                    Online
-                  </span>
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">System Status</h3>
+            <p className="text-sm text-gray-600 mb-6">Current system health and performance</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+                <div className={`w-3 h-3 rounded-full mr-3 ${
+                  systemStatus.apiHealth === 'online' ? 'bg-green-500' : 
+                  systemStatus.apiHealth === 'error' ? 'bg-yellow-500' : 'bg-red-500'
+                }`}></div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">API Response</p>
+                  <p className={`text-xs ${
+                    systemStatus.apiHealth === 'online' ? 'text-green-600' : 
+                    systemStatus.apiHealth === 'error' ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {systemStatus.apiHealth === 'online' ? 'Backend services running' :
+                     systemStatus.apiHealth === 'error' ? 'Service degraded' : 'Service unavailable'}
+                  </p>
                 </div>
-                
-                <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center">
-                    <ClockIcon className="mr-3 w-5 h-5 text-blue-500" />
-                    <div>
-                      <p className="text-sm font-medium text-blue-900">API Response</p>
-                      <p className="text-xs text-blue-700">Backend services running</p>
-                    </div>
-                  </div>
-                  <span className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full">
-                    Healthy
-                  </span>
+              </div>
+              
+              <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+                <div className={`w-3 h-3 rounded-full mr-3 ${
+                  systemStatus.databaseStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'
+                }`}></div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Database</p>
+                  <p className={`text-xs ${
+                    systemStatus.databaseStatus === 'connected' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {systemStatus.databaseStatus === 'connected' ? 'Connected' : 'Disconnected'}
+                  </p>
                 </div>
-
-                <div className="flex justify-between items-center p-4 bg-indigo-50 rounded-lg border border-indigo-200">
-                  <div className="flex items-center">
-                    <ArrowTrendingUpIcon className="mr-3 w-5 h-5 text-indigo-500" />
-                    <div>
-                      <p className="text-sm font-medium text-indigo-900">Performance</p>
-                      <p className="text-xs text-indigo-700">Optimal response times</p>
-                    </div>
-                  </div>
-                  <span className="px-2 py-1 text-xs font-medium text-indigo-700 bg-indigo-100 rounded-full">
-                    Fast
-                  </span>
+              </div>
+              
+              <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+                <div className="w-3 h-3 rounded-full mr-3 bg-blue-500"></div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Response Time</p>
+                  <p className={`text-xs ${
+                    systemStatus.responseTime < 100 ? 'text-green-600' : 
+                    systemStatus.responseTime < 500 ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {systemStatus.responseTime > 0 ? `${systemStatus.responseTime}ms` : 'N/A'}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+                <div className="w-3 h-3 rounded-full mr-3 bg-purple-500"></div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Last Checked</p>
+                  <p className="text-xs text-gray-600">
+                    {new Date(systemStatus.lastChecked).toLocaleTimeString()}
+                  </p>
                 </div>
               </div>
             </div>

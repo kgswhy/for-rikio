@@ -2,12 +2,17 @@ package routes
 
 import (
 	"database/sql"
+	"fmt"
+	"net/http"
+	"time"
 
 	"attendance-system/handlers"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
+
+var startTime = time.Now()
 
 // SetupRoutes configures all the routes for the application
 func SetupRoutes(r *gin.Engine, db *sql.DB) {
@@ -58,11 +63,25 @@ func SetupRoutes(r *gin.Engine, db *sql.DB) {
 		}
 	}
 
-	// Health check endpoint
+	// Enhanced health check endpoint
 	r.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":  "ok",
-			"message": "Attendance System API is running",
+		// Check database connection
+		var dbStatus string
+		if err := db.Ping(); err != nil {
+			dbStatus = "disconnected"
+		} else {
+			dbStatus = "connected"
+		}
+
+		uptime := time.Since(startTime)
+		uptimeStr := fmt.Sprintf("%.0fs", uptime.Seconds())
+
+		c.JSON(http.StatusOK, gin.H{
+			"status":    "ok",
+			"message":   "Attendance System API is running",
+			"uptime":    uptimeStr,
+			"database":  dbStatus,
+			"timestamp": time.Now().Format(time.RFC3339),
 		})
 	})
 
