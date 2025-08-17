@@ -440,11 +440,11 @@ export default function Dashboard() {
           </div>
 
           {/* System Status */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">System Status</h3>
-            <p className="text-sm text-gray-600 mb-6">Current system health and performance</p>
+          <div className="p-6 bg-white rounded-xl border border-gray-200">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900">System Status</h3>
+            <p className="mb-6 text-sm text-gray-600">Current system health and performance</p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
               <div className="flex items-center p-4 bg-gray-50 rounded-lg">
                 <div className={`w-3 h-3 rounded-full mr-3 ${
                   systemStatus.apiHealth === 'online' ? 'bg-green-500' : 
@@ -477,7 +477,7 @@ export default function Dashboard() {
               </div>
               
               <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-                <div className="w-3 h-3 rounded-full mr-3 bg-blue-500"></div>
+                <div className="mr-3 w-3 h-3 bg-blue-500 rounded-full"></div>
                 <div>
                   <p className="text-sm font-medium text-gray-900">Response Time</p>
                   <p className={`text-xs ${
@@ -490,7 +490,7 @@ export default function Dashboard() {
               </div>
               
               <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-                <div className="w-3 h-3 rounded-full mr-3 bg-purple-500"></div>
+                <div className="mr-3 w-3 h-3 bg-purple-500 rounded-full"></div>
                 <div>
                   <p className="text-sm font-medium text-gray-900">Last Checked</p>
                   <p className="text-xs text-gray-600">
