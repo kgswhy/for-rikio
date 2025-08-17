@@ -17,6 +17,11 @@ import {
   getAttendanceStatusIcon,
   downloadCSV
 } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function AttendancePage() {
   const [attendanceLogs, setAttendanceLogs] = useState<AttendanceLog[]>([]);
@@ -111,8 +116,8 @@ export default function AttendancePage() {
   if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="flex justify-center items-center h-64">
+          <div className="w-12 h-12 rounded-full border-b-2 border-blue-500 animate-spin"></div>
         </div>
       </Layout>
     );
@@ -130,149 +135,146 @@ export default function AttendancePage() {
             </p>
           </div>
           <div className="flex space-x-3">
-            <button
+            <Button
               onClick={() => {
                 setModalType('clock-in');
                 setIsModalOpen(true);
               }}
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              className="flex gap-2 items-center bg-green-600 hover:bg-green-700"
             >
-              <ClockIcon className="mr-2 h-4 w-4" />
+              <ClockIcon className="w-4 h-4" />
               Clock In
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => {
                 setModalType('clock-out');
                 setIsModalOpen(true);
               }}
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-orange-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+              className="flex gap-2 items-center bg-orange-600 hover:bg-orange-700"
             >
-              <ClockIcon className="mr-2 h-4 w-4" />
+              <ClockIcon className="w-4 h-4" />
               Clock Out
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900 flex items-center">
-              <FunnelIcon className="mr-2 h-5 w-5" />
-              Filters
-            </h3>
-            <button
-              onClick={clearFilters}
-              className="text-sm text-gray-500 hover:text-gray-700"
-            >
-              Clear filters
-            </button>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div>
-              <label htmlFor="date" className="block text-sm font-medium text-gray-700">
-                Date
-              </label>
-              <input
-                type="date"
-                id="date"
-                value={filters.date || ''}
-                onChange={(e) => handleFilterChange('date', e.target.value || undefined)}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-              />
-            </div>
-            <div>
-              <label htmlFor="department" className="block text-sm font-medium text-gray-700">
-                Department
-              </label>
-              <select
-                id="department"
-                value={filters.department_id || ''}
-                onChange={(e) => handleFilterChange('department_id', e.target.value ? parseInt(e.target.value) : undefined)}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex gap-2 items-center text-lg">
+                <FunnelIcon className="w-5 h-5" />
+                Filters
+              </CardTitle>
+              <Button
+                onClick={clearFilters}
+                variant="outline"
+                size="sm"
               >
-                <option value="">All Departments</option>
-                {departments.map((dept) => (
-                  <option key={dept.id} value={dept.id}>
-                    {dept.departement_name}
-                  </option>
-                ))}
-              </select>
+                Clear filters
+              </Button>
             </div>
-          </div>
-        </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="space-y-2">
+                <Label htmlFor="date">Date</Label>
+                <Input
+                  type="date"
+                  id="date"
+                  value={filters.date || ''}
+                  onChange={(e) => handleFilterChange('date', e.target.value || undefined)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="department">Department</Label>
+                <Select
+                  value={filters.department_id?.toString() || ''}
+                  onValueChange={(value) => handleFilterChange('department_id', value ? parseInt(value) : undefined)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Departments" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Departments</SelectItem>
+                    {departments.map((dept) => (
+                      <SelectItem key={dept.id} value={dept.id.toString()}>
+                        {dept.departement_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Attendance Logs */}
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Attendance Logs
-              </h3>
-              <button 
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-lg">Attendance Logs</CardTitle>
+              <Button 
                 onClick={handleExportCSV}
-                className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
+                variant="outline"
+                size="sm"
+                className="flex gap-2 items-center"
               >
-                <ArrowDownTrayIcon className="mr-1 h-4 w-4" />
+                <ArrowDownTrayIcon className="w-4 h-4" />
                 Export CSV
-              </button>
+              </Button>
             </div>
-          </div>
-          <ul className="divide-y divide-gray-200">
-            {(attendanceLogs || []).map((log) => (
-              <li key={log.id}>
-                <div className="px-4 py-4 sm:px-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                          log.is_on_time ? 'bg-green-100' : 'bg-red-100'
-                        }`}>
-                          <span className={`text-sm font-medium ${
-                            log.is_on_time ? 'text-green-800' : 'text-red-800'
-                          }`}>
-                            {getAttendanceStatusIcon(log.is_on_time)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <div className="flex items-center">
-                          <p className="text-sm font-medium text-gray-900">
-                            {log.employee_name}
-                          </p>
-                          <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            log.attendance_type === 1 
-                              ? 'bg-blue-100 text-blue-800' 
-                              : 'bg-orange-100 text-orange-800'
-                          }`}>
-                            {getAttendanceTypeLabel(log.attendance_type)}
-                          </span>
-                        </div>
-                        <div className="mt-1 flex items-center text-sm text-gray-500">
-                          <p className="mr-4">Department: {log.department_name}</p>
-                          <p>Time: {formatDate(log.date_attendance, 'HH:mm')}</p>
-                        </div>
-                        <p className="mt-1 text-sm text-gray-500">
-                          Date: {formatDate(log.date_attendance, 'dd/MM/yyyy')}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center">
-                      <span className={`text-sm font-medium ${getAttendanceStatusColor(log.is_on_time)}`}>
-                        {log.is_on_time ? 'On Time' : 'Late/Early'}
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {(attendanceLogs || []).map((log) => (
+                <div key={log.id} className="flex justify-between items-center p-4 rounded-lg border transition-colors hover:bg-gray-50">
+                  <div className="flex items-center space-x-4">
+                    <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
+                      log.is_on_time ? 'bg-green-100' : 'bg-red-100'
+                    }`}>
+                      <span className={`text-sm font-medium ${
+                        log.is_on_time ? 'text-green-800' : 'text-red-800'
+                      }`}>
+                        {getAttendanceStatusIcon(log.is_on_time)}
                       </span>
                     </div>
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <p className="text-sm font-medium text-gray-900">
+                          {log.employee_name}
+                        </p>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          log.attendance_type === 1 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : 'bg-orange-100 text-orange-800'
+                        }`}>
+                          {getAttendanceTypeLabel(log.attendance_type)}
+                        </span>
+                      </div>
+                      <div className="flex items-center mt-1 space-x-4 text-sm text-gray-500">
+                        <span>Department: {log.department_name}</span>
+                        <span>Time: {formatDate(log.date_attendance, 'HH:mm')}</span>
+                        <span>Date: {formatDate(log.date_attendance, 'dd/MM/yyyy')}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <span className={`text-sm font-medium ${getAttendanceStatusColor(log.is_on_time)}`}>
+                      {log.is_on_time ? 'On Time' : 'Late/Early'}
+                    </span>
                   </div>
                 </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+              ))}
+            </div>
 
-        {(attendanceLogs || []).length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No attendance logs found.</p>
-          </div>
-        )}
+            {(attendanceLogs || []).length === 0 && (
+              <div className="py-12 text-center">
+                <p className="text-gray-500">No attendance logs found.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Attendance Modal */}

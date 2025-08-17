@@ -13,6 +13,9 @@ import { EmployeeWithDepartment, Department, CreateEmployeeRequest } from '@/typ
 import Layout from '@/components/layout/Layout';
 import EmployeeModal from '@/components/employees/EmployeeModal';
 import { downloadCSV } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState<EmployeeWithDepartment[]>([]);
@@ -119,91 +122,89 @@ export default function EmployeesPage() {
             </p>
           </div>
           <div className="flex space-x-3">
-            <button
+            <Button
               onClick={handleExportCSV}
-              className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+              variant="outline"
+              className="flex items-center gap-2"
             >
-              <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
+              <ArrowDownTrayIcon className="h-4 w-4" />
               Export CSV
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
             >
-              <PlusIcon className="mr-2 h-4 w-4" />
+              <PlusIcon className="h-4 w-4" />
               Add Employee
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Search */}
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-          </div>
-          <input
+          <MagnifyingGlassIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <Input
             type="text"
             placeholder="Search employees..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="pl-10"
           />
         </div>
 
-        {/* Employees Table */}
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <ul className="divide-y divide-gray-200">
-            {filteredEmployees.map((employee) => (
-              <li key={employee.id}>
-                <div className="px-4 py-4 sm:px-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-800">
-                            {employee.name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <div className="flex items-center">
-                          <p className="text-sm font-medium text-gray-900">
-                            {employee.name}
-                          </p>
-                        </div>
-                        <div className="mt-1 flex items-center text-sm text-gray-500">
-                          <p className="mr-4">ID: {employee.employee_id}</p>
-                          <p>Department: {employee.department.departement_name}</p>
-                        </div>
-                        {employee.address && (
-                          <p className="mt-1 text-sm text-gray-500">
-                            {employee.address}
-                          </p>
-                        )}
-                      </div>
+        {/* Employees Cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredEmployees.map((employee) => (
+            <Card key={employee.id} className="hover:shadow-md transition-shadow">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                      <span className="text-sm font-medium text-blue-800">
+                        {employee.name.charAt(0).toUpperCase()}
+                      </span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => {
-                          setEditingEmployee(employee);
-                          setIsModalOpen(true);
-                        }}
-                        className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      >
-                        <PencilIcon className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteEmployee(employee.id)}
-                        className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </button>
+                    <div>
+                      <CardTitle className="text-lg">{employee.name}</CardTitle>
+                      <CardDescription>ID: {employee.employee_id}</CardDescription>
                     </div>
                   </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setEditingEmployee(employee);
+                        setIsModalOpen(true);
+                      }}
+                    >
+                      <PencilIcon className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDeleteEmployee(employee.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </li>
-            ))}
-          </ul>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Department:</span>
+                  <span className="font-medium">{employee.department.departement_name}</span>
+                </div>
+                {employee.address && (
+                  <div className="text-sm">
+                    <span className="text-gray-600">Address:</span>
+                    <p className="text-gray-900 mt-1">{employee.address}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {filteredEmployees.length === 0 && (

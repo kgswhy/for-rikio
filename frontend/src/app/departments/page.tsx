@@ -13,6 +13,9 @@ import { Department, CreateDepartmentRequest } from '@/types';
 import Layout from '@/components/layout/Layout';
 import DepartmentModal from '@/components/departments/DepartmentModal';
 import { formatTime, downloadCSV } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function DepartmentsPage() {
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -87,8 +90,8 @@ export default function DepartmentsPage() {
   if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="flex justify-center items-center h-64">
+          <div className="w-12 h-12 rounded-full border-b-2 border-blue-500 animate-spin"></div>
         </div>
       </Layout>
     );
@@ -106,87 +109,94 @@ export default function DepartmentsPage() {
             </p>
           </div>
           <div className="flex space-x-3">
-            <button
+            <Button
               onClick={handleExportCSV}
-              className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200"
+              variant="outline"
+              className="flex gap-2 items-center"
             >
-              <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
+              <ArrowDownTrayIcon className="w-4 h-4" />
               Export CSV
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              className="flex gap-2 items-center bg-green-600 hover:bg-green-700"
             >
-              <PlusIcon className="mr-2 h-4 w-4" />
+              <PlusIcon className="w-4 h-4" />
               Add Department
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Search */}
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-          </div>
-          <input
+          <MagnifyingGlassIcon className="absolute top-3 left-3 w-5 h-5 text-gray-400" />
+          <Input
             type="text"
             placeholder="Search departments..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+            className="pl-10"
           />
         </div>
 
         {/* Departments Grid */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredDepartments.map((department) => (
-            <div key={department.id} className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-medium text-gray-900">
-                      {department.departement_name}
-                    </h3>
-                    <div className="mt-2 space-y-2">
-                      <div className="flex items-center text-sm text-gray-500">
-                        <span className="font-medium mr-2">Max Clock In:</span>
-                        <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
-                          {formatTime(department.max_clock_in_time)}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <span className="font-medium mr-2">Max Clock Out:</span>
-                        <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">
-                          {formatTime(department.max_clock_out_time)}
-                        </span>
-                      </div>
+            <Card key={department.id} className="transition-shadow hover:shadow-md">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex justify-center items-center w-10 h-10 bg-green-100 rounded-full">
+                      <span className="text-sm font-medium text-green-800">
+                        {department.departement_name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">{department.departement_name}</CardTitle>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2 ml-4">
-                    <button
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => {
                         setEditingDepartment(department);
                         setIsModalOpen(true);
                       }}
-                      className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                     >
-                      <PencilIcon className="h-4 w-4" />
-                    </button>
-                    <button
+                      <PencilIcon className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => handleDeleteDepartment(department.id)}
-                      className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
-                      <TrashIcon className="h-4 w-4" />
-                    </button>
+                      <TrashIcon className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md">
+                  <span className="text-sm font-medium text-gray-700">Max Clock In:</span>
+                  <span className="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded">
+                    {formatTime(department.max_clock_in_time)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md">
+                  <span className="text-sm font-medium text-gray-700">Max Clock Out:</span>
+                  <span className="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded">
+                    {formatTime(department.max_clock_out_time)}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
 
         {filteredDepartments.length === 0 && (
-          <div className="text-center py-12">
+          <div className="py-12 text-center">
             <p className="text-gray-500">No departments found.</p>
           </div>
         )}
